@@ -18,8 +18,14 @@ WORKDIR /var/www/html
 # Copy app
 COPY . .
 
+# Setup .env
+RUN cp .env.example .env
+
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Generate app key
+RUN php artisan key:generate
 
 # Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
