@@ -25,7 +25,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Nginx config
-RUN echo 'server { \
+RUN mkdir -p /run/nginx && echo 'server { \
     listen 80; \
     root /var/www/html/public; \
     index index.php; \
@@ -39,12 +39,7 @@ RUN echo 'server { \
 }' > /etc/nginx/http.d/default.conf
 
 # Supervisor config
-RUN echo '[supervisord] \
-nodaemon=true \
-[program:nginx] \
-command=nginx -g "daemon off;" \
-[program:php-fpm] \
-command=php-fpm' > /etc/supervisord.conf
+RUN mkdir -p /etc/supervisor.d && printf '[supervisord]\nnodaemon=true\nuser=root\n\n[program:nginx]\ncommand=nginx -g "daemon off;"\nautostart=true\nautorestart=true\n\n[program:php-fpm]\ncommand=php-fpm\nautostart=true\nautorestart=true\n' > /etc/supervisor.d/app.ini
 
 EXPOSE 80
 
